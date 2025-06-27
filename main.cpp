@@ -29,7 +29,14 @@ vector<complex<demo_t>> ifft(const vector<complex<demo_t>>& spectrum);
 
 int main(void) {
 
-    auto samples = to_complex(sample_function(my_signal, 20, 0, 1));
+    // complex<double> a(1.0, 2.0), b(3.0, 4.0);
+    // a *= b;
+    // cout << a;
+
+    auto samples = to_complex(sample_function(my_signal, 10, 0, 1));
+
+    samples[0].imaginary = 2.5;
+
     auto spectrum = dft(samples);
 
     print_vector(samples);
@@ -46,7 +53,7 @@ int main(void) {
 }
 
 demo_t my_signal(demo_t x) {
-    demo_t frequency_1 = 5;
+    demo_t frequency_1 = 1;
     return 100 * sin(TWOPI * x * frequency_1) + cos(TWOPI * x * 2);
 }
 
@@ -91,9 +98,16 @@ vector<complex<demo_t>> dft(const vector<complex<demo_t>>& signal) {
 }
 
 vector<complex<demo_t>> idft(const vector<complex<demo_t>>& spectrum) {
-    auto l_spectrum = spectrum;
-    for(auto& c : l_spectrum) c = c.conjugate();
-    auto idft = dft(l_spectrum);
-    for(auto& c : idft) c = c.conjugate() / (demo_t) spectrum.size();
-    return idft;
+    size_t N = spectrum.size();
+
+    vector<complex<demo_t>> samples(N, 0);
+    for(size_t sample = 0; sample < N; ++sample) {
+        for(size_t m = 0; m < N; ++m) {
+            demo_t angle = (TWOPI * sample * m) / N;
+            samples.at(sample) += spectrum.at(m) * complex<demo_t>(cos(angle), sin(angle));
+        }
+        samples.at(sample) /= (demo_t) N;
+    }
+
+    return samples;
 }
