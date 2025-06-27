@@ -7,7 +7,7 @@
 #include "complex.hpp"
 
 template<typename TYPE>
-complex<TYPE>::complex(TYPE the_real) : real(the_real) {}
+complex<TYPE>::complex(TYPE the_real) : real(the_real), imaginary(0) {}
 
 template<typename TYPE>
 complex<TYPE>::complex(TYPE the_real, TYPE the_imaginary) : real(the_real), imaginary(the_imaginary) {}
@@ -42,10 +42,13 @@ complex<TYPE>& complex<TYPE>::operator*=(TYPE rhs) {
     return *this;
 }
 
-// template<typename TYPE>
-// complex<TYPE>& complex<TYPE>::operator/=(TYPE rhs) {
-
-// }
+template<typename TYPE>
+complex<TYPE>& complex<TYPE>::operator/=(TYPE rhs) {
+    //assume rhs is non zero, its the programmers fault if they try this.
+    this->real /= rhs;
+    this->imaginary /= rhs;
+    return *this;
+}
 
 //Compound assignment complex to complex operator overloads.
 template<typename TYPE>
@@ -64,8 +67,9 @@ complex<TYPE>& complex<TYPE>::operator-=(complex<TYPE> rhs) {
 
 template<typename TYPE>
 complex<TYPE>& complex<TYPE>::operator*=(complex<TYPE> rhs) {
-    this->real = this->real * rhs.real - this->imaginary * rhs.imaginary;
+    TYPE new_real = this->real * rhs.real - this->imaginary * rhs.imaginary;
     this->imaginary = this->imaginary * rhs.real + this->real * rhs.imaginary;
+    this->real = new_real;
     return *this;
 }
 
@@ -148,7 +152,8 @@ complex<TYPE> operator*(complex<TYPE> lhs, TYPE rhs) {
     return lhs;
 }
 
-// template<typename TYPE>
-// complex<TYPE> operator/(complex<TYPE> lhs, TYPE rhs) {
-    
-// }
+template<typename TYPE>
+complex<TYPE> operator/(complex<TYPE> lhs, TYPE rhs) {
+    lhs /= rhs;
+    return lhs;
+}
